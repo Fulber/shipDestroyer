@@ -1,9 +1,5 @@
 package com.dejava.shipDestroyer.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
-
 public class GameStartedEvent {
 
     private String gameId;
@@ -11,9 +7,7 @@ public class GameStartedEvent {
     private Integer battlegroundSize;
 
     private BattleshipCell core;
-
-    @JsonProperty(value = "battleshipTemplate.canvas")
-    private List<List<BattleshipCell>> battleshipTemplate;
+    private BattleshipTemplate battleshipTemplate;
 
     public String getGameId() {
         return gameId;
@@ -47,11 +41,11 @@ public class GameStartedEvent {
         this.core = core;
     }
 
-    public List<List<BattleshipCell>> getBattleshipTemplate() {
+    public BattleshipTemplate getBattleshipTemplate() {
         return battleshipTemplate;
     }
 
-    public void setBattleshipTemplate(List<List<BattleshipCell>> battleshipTemplate) {
+    public void setBattleshipTemplate(BattleshipTemplate battleshipTemplate) {
         this.battleshipTemplate = battleshipTemplate;
     }
 }
