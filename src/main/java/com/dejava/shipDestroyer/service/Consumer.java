@@ -121,15 +121,20 @@ public class Consumer {
 
         if (tournamentId.equals(event.getTournamentId())) {
 
-            GameBoard board = gameBoardRepository.findById(event.getGameId()).get();
-            String[][] boardMatrix = board.getBoard();
+            Optional<GameBoard> board = gameBoardRepository.findById(event.getGameId());
+
+            if(board.isEmpty()) {
+                return;
+            }
+
+            String[][] boardMatrix = board.get().getBoard();
 
             for (Shot shot : event.getShots()) {
                 if (boardMatrix[shot.getX()][shot.getY()] == null) {
                     switch (shot.getStatus()) {
                         case HIT:
                             boardMatrix[shot.getX()][shot.getY()] = "HIT";
-                            board.setLastHit(shot);
+                            board.get().setLastHit(shot);
                             break;
                         case MISS:
                             boardMatrix[shot.getX()][shot.getY()] = "MISS";
@@ -143,9 +148,9 @@ public class Consumer {
             }
 
             String boardJson = new ObjectMapper().writeValueAsString(boardMatrix);
-            board.setBoardJson(boardJson);
+            board.get().setBoardJson(boardJson);
 
-            gameBoardRepository.save(board);
+            gameBoardRepository.save(board.get());
         }
     }
 
