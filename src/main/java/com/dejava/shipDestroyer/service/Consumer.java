@@ -25,6 +25,8 @@ public class Consumer {
     @Autowired
     private RestService restService;
     @Autowired
+    private ProcessingService processing;
+    @Autowired
     private GameStartedEventRepository gameStartedEventRepository;
     @Autowired
     private GameBoardRepository gameBoardRepository;
@@ -126,8 +128,55 @@ public class Consumer {
 
     private String[][] generateBoardWithPlacement(GameStartedEvent event, BattleshipPlacement placement) {
         String[][] board = new String[event.getBattlegroundSize()][event.getBattlegroundSize()];
-
-
+        var canvas = event.getBattleshipTemplate().getCanvas();
+        DIRECTION direction = placement.getDirection();
+        int x = placement.getX();
+        int y = placement.getY();
+        int canvasHeight, canvasWidth;
+        switch (placement.getDirection()) {
+            case NORTH:
+                canvasHeight = canvas.length;
+                canvasWidth = canvas[0].length;
+                for(int canvasY = 0; canvasY < canvasHeight; canvasY ++) {
+                    for(int canvasX = 0; canvasX < canvasWidth; canvasX ++) {
+                        board[y + canvasY][x + canvasX] = canvas[canvasY][canvasX].getHp() > 0 ? "MISS" : null;
+                    }
+                }
+                break;
+            case EAST:
+                canvas = processing.rotateClockWise(canvas);
+                canvasHeight = canvas.length;
+                canvasWidth = canvas[0].length;
+                for(int canvasY = 0; canvasY < canvasHeight; canvasY ++) {
+                    for(int canvasX = 0; canvasX < canvasWidth; canvasX ++) {
+                        board[y + canvasY][x + canvasX] = canvas[canvasY][canvasX].getHp() > 0 ? "MISS" : null;
+                    }
+                }
+                break;
+            case SOUTH:
+                canvas = processing.rotateClockWise(canvas);
+                canvas = processing.rotateClockWise(canvas);
+                canvasHeight = canvas.length;
+                canvasWidth = canvas[0].length;
+                for(int canvasY = 0; canvasY < canvasHeight; canvasY ++) {
+                    for(int canvasX = 0; canvasX < canvasWidth; canvasX ++) {
+                        board[y - canvasY][x - canvasX] = canvas[canvasY][canvasX].getHp() > 0 ? "MISS" : null;
+                    }
+                }
+                break;
+            case WEST:
+                canvas = processing.rotateClockWise(canvas);
+                canvas = processing.rotateClockWise(canvas);
+                canvas = processing.rotateClockWise(canvas);
+                canvasHeight = canvas.length;
+                canvasWidth = canvas[0].length;
+                for(int canvasY = 0; canvasY < canvasHeight; canvasY ++) {
+                    for(int canvasX = 0; canvasX < canvasWidth; canvasX ++) {
+                        board[y - canvasY][x - canvasX] = canvas[canvasY][canvasX].getHp() > 0 ? "MISS" : null;
+                    }
+                }
+                break;
+        }
         return board;
     }
 }

@@ -14,7 +14,7 @@ public class ProcessingService {
 
   private HashMap<String, Integer> possibleOptions = new HashMap<String, Integer>();
 
-  private BattleshipCell[][] rotateClockWise(BattleshipCell[][] canvas) {
+  public BattleshipCell[][] rotateClockWise(BattleshipCell[][] canvas) {
     int n = canvas.length;
     int m = canvas[0].length;
     BattleshipCell [][] output = new BattleshipCell [m][n];
@@ -40,8 +40,8 @@ public class ProcessingService {
               int newX = boardX - templateX + canvasX;
               if (newY < 0 || newY > battlegroundSize) { ok = false; break; }
               if (newX < 0 || newX > battlegroundSize) { ok = false; break; }
-              if (battleground[newY][newX] == "hit" && canvas[canvasY][canvasX].getHp() == 0) { ok = false; break; }
-              if (battleground[newY][newX] == "miss" && canvas[canvasY][canvasX].getHp() != 0) { ok = false; break; }
+              if (battleground[newY][newX] == "HIT" && canvas[canvasY][canvasX].getHp() == 0) { ok = false; break; }
+              if (battleground[newY][newX] == "MISS" && canvas[canvasY][canvasX].getHp() != 0) { ok = false; break; }
             }
           }
           if (ok) {
