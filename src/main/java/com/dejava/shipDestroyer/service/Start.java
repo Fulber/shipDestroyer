@@ -25,8 +25,7 @@ public class Start {
     public void init() {
         while (true) {
             try {
-                String token = restService.authenticate();
-                restService.registerToTournament(token, tournamentId);
+                restService.registerToTournament(tournamentId);
 
                 logger.info("-------------- REGISTERED TO TOURNAMENT");
                 break;

@@ -32,21 +32,22 @@ public class RestService {
         return response != null ? response.getToken() : null;
     }
 
-    public void registerToTournament(String token, String tournamentId) {
+    public void registerToTournament(String tournamentId) {
         String url = baseUrl + "/api/tournaments/" + tournamentId + "/teams";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token);
+        headers.setBearerAuth(authenticate());
 
         new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>("{}", headers), Void.class);
     }
 
-    public void registerShipToTournament(String token, String tournamentId, BattleshipPlacement placement) {
+    public void registerShipToTournament(String tournamentId, BattleshipPlacement placement) {
         String url = baseUrl + "/api/tournaments/" + tournamentId + "/battleships";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(authenticate());
 
         new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>(placement, headers), Void.class);
     }

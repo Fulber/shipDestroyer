@@ -8,6 +8,23 @@ public class ShotFiredEvent {
     private int x;
     private int y;
 
+    public ShotFiredEvent() {
+    }
+
+    public ShotFiredEvent(String gameId, String tournamentId, int roundNo) {
+        this.gameId = gameId;
+        this.tournamentId = tournamentId;
+        this.roundNo = roundNo;
+    }
+
+    public ShotFiredEvent(String gameId, String tournamentId, int roundNo, int x, int y) {
+        this.gameId = gameId;
+        this.tournamentId = tournamentId;
+        this.roundNo = roundNo;
+        this.x = x;
+        this.y = y;
+    }
+
     public String getGameId() {
         return gameId;
     }

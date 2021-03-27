@@ -23,6 +23,8 @@ public class Consumer {
     public static final String GAME_STARTED_EVENT = "GameStartedEvent";
 
     @Autowired
+    private Producer producer;
+    @Autowired
     private RestService restService;
     @Autowired
     private ProcessingService processing;
@@ -47,16 +49,11 @@ public class Consumer {
 
             while (true) {
                 try {
-                    String token = restService.authenticate();
+                    BattleshipPlacement placement = randomBattleshipPlacement(event.getGameId(), event.getBattlegroundSize());
 
-                    int x = r.nextInt(event.getBattlegroundSize());
-                    int y = r.nextInt(event.getBattlegroundSize());
-                    DIRECTION dir = DIRECTION.values()[r.nextInt(DIRECTION.values().length)];
+                    restService.registerShipToTournament(tournamentId, placement);
 
-                    BattleshipPlacement placement = new BattleshipPlacement(event.getGameId(), x, y, dir);
-                    restService.registerShipToTournament(token, tournamentId, placement);
-
-                    logger.info("SHIP PLACED " + tournamentId + " - " + event.getGameId() + "[" + x + "," + y + "," + dir + "]");
+                    logger.info("SHIP PLACED " + tournamentId + " - " + event.getGameId() + "[" + placement + "]");
 
                     String boardJson = new ObjectMapper().writeValueAsString(generateBoardWithPlacement(event, placement));
                     gameBoardRepository.save(new GameBoard(event.getGameId(), event.getTournamentId(), event.getBattlegroundSize(), boardJson));
@@ -86,9 +83,21 @@ public class Consumer {
     public void roundStartedEvent(String message) throws IOException {
         RoundStartedEvent event = new ObjectMapper().readValue(message, RoundStartedEvent.class);
 
-        //TODO shot here
         if (tournamentId.equals(event.getTournamentId())) {
             logger.info("ROUND STARTED EVENT " + tournamentId + " - " + event.getGameId() + " - " + event.getRoundNo());
+
+            GameBoard board = gameBoardRepository.findById(event.getGameId()).get();
+
+            ShotFiredEvent shot = new ShotFiredEvent(event.getGameId(), tournamentId, event.getRoundNo());
+            if (board.getNextPossibleShot() == null) {
+                shot.setX(r.nextInt(board.getBattlegroundSize()));
+                shot.setY(r.nextInt(board.getBattlegroundSize()));
+            } else {
+                shot.setX(board.getNextPossibleShot().getX());
+                shot.setY(board.getNextPossibleShot().getY());
+            }
+
+            producer.shoot(shot);
         }
     }
 
@@ -98,7 +107,7 @@ public class Consumer {
 
         if (tournamentId.equals(event.getTournamentId())) {
 
-            GameBoard board = gameBoardRepository.findById(event.getGameId()).orElseGet(null);
+            GameBoard board = gameBoardRepository.findById(event.getGameId()).get();
             String[][] boardMatrix = board.getBoard();
 
             for (Shot shot : event.getShots()) {
@@ -178,5 +187,10 @@ public class Consumer {
                 break;
         }
         return board;
+    }
+
+    private BattleshipPlacement randomBattleshipPlacement(String gameId, int size) {
+        DIRECTION dir = DIRECTION.values()[r.nextInt(DIRECTION.values().length)];
+        return new BattleshipPlacement(gameId, r.nextInt(size), r.nextInt(size), dir);
     }
 }
