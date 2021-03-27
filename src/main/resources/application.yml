@@ -2,9 +2,9 @@ server:
   port: 9000
 logging:
   level:
-    root: WARN
-    org.springframework: INFO
-    org.apache.kafka: WARN
+    root: INFO
+    org.springframework: ERROR
+    org.apache.kafka: INFO
 spring:
   datasource:
     url: jdbc:h2:~/jooq
@@ -13,14 +13,13 @@ spring:
     password:
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
   kafka:
     bootstrap-servers: "pkc-lq8gm.westeurope.azure.confluent.cloud:9092"
     properties:
       security.protocol: SASL_SSL
       sasl.mechanism: PLAIN
       sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="2KMN4QMBLKLNUOID" password="7Cxt0++/BWRYdk1JRh+cuzOcpKQdl8scne0fr6ld/74sEMe2IxrW7mlJi+blfyw5";
-      spring.json.trusted.packages: com.dejava.shipDestroyer.model.*
     consumer:
       group-id: group-014ffa89-f169-4cfa-afd5-fc8d73c6dd75
       auto-offset-reset: earliest

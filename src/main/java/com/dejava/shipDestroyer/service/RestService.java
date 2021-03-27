@@ -42,7 +42,7 @@ public class RestService {
         new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>("{}", headers), Void.class);
     }
 
-    public void registerShipToTournament(String token, String tournamentId, String gameId, BattleshipPlacement placement) {
+    public void registerShipToTournament(String token, String tournamentId, BattleshipPlacement placement) {
         String url = baseUrl + "/api/tournaments/" + tournamentId + "/battleships";
 
         HttpHeaders headers = new HttpHeaders();

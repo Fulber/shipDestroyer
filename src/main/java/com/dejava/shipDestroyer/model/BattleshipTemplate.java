@@ -16,9 +16,11 @@ public class BattleshipTemplate {
     private int height;
 
     @Transient
-    private BattleshipCell[][] canvasList;
+    private BattleshipCell[][] canvas;
 
-    private String canvas;
+    @Lob
+    @Column
+    private String canvasJson;
 
     public BattleshipTemplate() {
     }
@@ -47,25 +49,35 @@ public class BattleshipTemplate {
         this.height = height;
     }
 
-    public BattleshipCell[][] getCanvasList() {
-        return canvasList;
-    }
+    public BattleshipCell[][] getCanvas() {
+        try {
+            this.canvas = new ObjectMapper().readValue(canvasJson, BattleshipCell[][].class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
 
-    public void setCanvasList(BattleshipCell[][] canvasList) {
-        this.canvasList = canvasList;
-    }
-
-    public String getCanvas() {
         return canvas;
     }
 
-    public void setCanvas(String canvas) {
+    public void setCanvas(BattleshipCell[][] canvas) {
         this.canvas = canvas;
 
         try {
-            BattleshipCell[][] battleshipCells = new ObjectMapper().readValue(canvas, BattleshipCell[][].class);
+            this.canvasJson = new ObjectMapper().writeValueAsString(canvas);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
 
-            setCanvasList(battleshipCells);
+    public String getCanvasJson() {
+        return canvasJson;
+    }
+
+    public void setCanvasJson(String canvasJson) {
+        this.canvasJson = canvasJson;
+
+        try {
+            this.canvas = new ObjectMapper().readValue(canvasJson, BattleshipCell[][].class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
