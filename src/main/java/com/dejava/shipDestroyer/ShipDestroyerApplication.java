@@ -11,5 +11,4 @@ public class ShipDestroyerApplication {
     public static void main(String[] args) {
         SpringApplication.run(ShipDestroyerApplication.class, args);
     }
-
 }

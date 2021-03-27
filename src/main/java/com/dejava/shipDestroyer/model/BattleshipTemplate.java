@@ -1,21 +1,34 @@
 package com.dejava.shipDestroyer.model;
 
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.persistence.*;
+
+@Entity
 public class BattleshipTemplate {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     private int width;
     private int height;
 
-    private List<List<BattleshipCell>> canvas;
+    @Transient
+    private BattleshipCell[][] canvasList;
+
+    private String canvas;
 
     public BattleshipTemplate() {
     }
 
-    public BattleshipTemplate(int width, int height, List<List<BattleshipCell>> canvas) {
-        this.width = width;
-        this.height = height;
-        this.canvas = canvas;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public int getWidth() {
@@ -34,11 +47,27 @@ public class BattleshipTemplate {
         this.height = height;
     }
 
-    public List<List<BattleshipCell>> getCanvas() {
+    public BattleshipCell[][] getCanvasList() {
+        return canvasList;
+    }
+
+    public void setCanvasList(BattleshipCell[][] canvasList) {
+        this.canvasList = canvasList;
+    }
+
+    public String getCanvas() {
         return canvas;
     }
 
-    public void setCanvas(List<List<BattleshipCell>> canvas) {
+    public void setCanvas(String canvas) {
         this.canvas = canvas;
+
+        try {
+            BattleshipCell[][] battleshipCells = new ObjectMapper().readValue(canvas, BattleshipCell[][].class);
+
+            setCanvasList(battleshipCells);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 }

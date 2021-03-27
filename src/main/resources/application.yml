@@ -11,6 +11,9 @@ spring:
     driverClassName: org.h2.Driver
     username: sa
     password:
+  jpa:
+    hibernate:
+      ddl-auto: update
   kafka:
     bootstrap-servers: "pkc-lq8gm.westeurope.azure.confluent.cloud:9092"
     properties:

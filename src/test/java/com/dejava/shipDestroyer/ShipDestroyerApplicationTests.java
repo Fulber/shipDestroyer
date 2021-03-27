@@ -1,5 +1,7 @@
 package com.dejava.shipDestroyer;
 
+import com.dejava.shipDestroyer.data.Token;
+import com.dejava.shipDestroyer.repository.TokenRepository;
 import com.dejava.shipDestroyer.service.RestService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,9 @@ class ShipDestroyerApplicationTests {
 
     @Autowired
     private RestService restService;
+
+    @Autowired
+    private TokenRepository tokenRepository;
 
     @Test
     void contextLoads() {
@@ -26,6 +31,11 @@ class ShipDestroyerApplicationTests {
     void registerWorks() {
         String token = restService.authenticate();
 
-        restService.registerToTournament(token, "i4Y6SG6FLw");
+        restService.registerToTournament(token, "Wd6MzuHU16");
+    }
+
+    @Test
+    void dbWorks() {
+        tokenRepository.save(new Token(100L, "test"));
     }
 }

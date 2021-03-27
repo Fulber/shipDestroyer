@@ -1,12 +1,23 @@
 package com.dejava.shipDestroyer.model;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+
+@Entity
 public class GameStartedEvent {
 
+    @Id
     private String gameId;
+
     private String tournamentId;
     private Integer battlegroundSize;
 
+    @OneToOne(cascade = CascadeType.ALL)
     private BattleshipCell core;
+
+    @OneToOne(cascade = CascadeType.ALL)
     private BattleshipTemplate battleshipTemplate;
 
     public String getGameId() {
