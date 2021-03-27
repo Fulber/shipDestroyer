@@ -46,7 +46,6 @@ public class RestService {
         String url = baseUrl + "/api/tournaments/" + tournamentId + "/battleships";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
 
         new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>(placement, headers), Void.class);

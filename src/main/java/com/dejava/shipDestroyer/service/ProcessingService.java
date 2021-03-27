@@ -72,7 +72,7 @@ public class ProcessingService {
     String[][] battleground = new String[battlegroundSize][battlegroundSize];
 
     var battleshipTemplate = game.getBattleshipTemplate();
-    var canvasNorth = battleshipTemplate.getCanvasList();
+    var canvasNorth = battleshipTemplate.getCanvas();
     this.addOptions(canvasNorth, boardY,boardX,battlegroundSize,battleground);
     var canvasEast = rotateClockWise(canvasNorth);
     this.addOptions(canvasEast, boardY,boardX,battlegroundSize,battleground);

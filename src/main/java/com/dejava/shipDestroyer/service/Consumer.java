@@ -43,11 +43,6 @@ public class Consumer {
 
             gameStartedEventRepository.save(event);
 
-            String[][] board = new String[event.getBattlegroundSize()][event.getBattlegroundSize()];
-            String boardJson = new ObjectMapper().writeValueAsString(board);
-
-            gameBoardRepository.save(new GameBoard(event.getGameId(), event.getTournamentId(), event.getBattlegroundSize(), boardJson));
-
             while (true) {
                 try {
                     String token = restService.authenticate();
@@ -59,8 +54,10 @@ public class Consumer {
                     BattleshipPlacement placement = new BattleshipPlacement(event.getGameId(), x, y, dir);
                     restService.registerShipToTournament(token, tournamentId, placement);
 
-                    //TODO add misses in the board for our ship
                     logger.info("SHIP PLACED " + tournamentId + " - " + event.getGameId() + "[" + x + "," + y + "," + dir + "]");
+
+                    String boardJson = new ObjectMapper().writeValueAsString(generateBoardWithPlacement(event, placement));
+                    gameBoardRepository.save(new GameBoard(event.getGameId(), event.getTournamentId(), event.getBattlegroundSize(), boardJson));
 
                     break;
                 } catch (Exception e) {
@@ -71,44 +68,66 @@ public class Consumer {
         }
     }
 
-//    @KafkaListener(topics = "cc.battleships.shot")
-//    public void shotFiredEvent(String message) throws IOException {
-//        logger.info(String.format("#### -> Consumed message -> %s", message));
-//
-//        ShotFiredEvent event = new ObjectMapper().readValue(message, ShotFiredEvent.class);
-//
-//        // TODO FIND HIT AND SHOOT
-//        if (tournamentId.equals(event.getTournamentId())) {
-//
-//        }
-//    }
+    @KafkaListener(topics = "cc.battleships.game.ended")
+    public void gameEndedEvent(String message) throws IOException {
+        GameEndedEvent event = new ObjectMapper().readValue(message, GameEndedEvent.class);
+
+        if (tournamentId.equals(event.getTournamentId())) {
+            logger.info("GAME ENDED EVENT " + tournamentId + " - " + event.getGameId());
+
+            gameStartedEventRepository.deleteById(event.getGameId());
+            gameBoardRepository.deleteById(event.getGameId());
+        }
+    }
 
     @KafkaListener(topics = "cc.battleships.round.started")
     public void roundStartedEvent(String message) throws IOException {
-//        logger.info(String.format("#### -> Consumed message -> %s", message));
-
         RoundStartedEvent event = new ObjectMapper().readValue(message, RoundStartedEvent.class);
 
         //TODO shot here
+        if (tournamentId.equals(event.getTournamentId())) {
+            logger.info("ROUND STARTED EVENT " + tournamentId + " - " + event.getGameId() + " - " + event.getRoundNo());
+        }
     }
 
     @KafkaListener(topics = "cc.battleships.round.ended")
     public void roundEndedEvent(String message) throws IOException {
-//        logger.info(String.format("#### -> Consumed message -> %s", message));
-
         RoundEndedEvent event = new ObjectMapper().readValue(message, RoundEndedEvent.class);
 
         if (tournamentId.equals(event.getTournamentId())) {
+
+            GameBoard board = gameBoardRepository.findById(event.getGameId()).orElseGet(null);
+            String[][] boardMatrix = board.getBoard();
+
             for (Shot shot : event.getShots()) {
-                switch (shot.getStatus()) {
-                    case HIT:
-                        break;
-                    case MISS:
-                        break;
-                    case KILL:
-                        break;
+                if (boardMatrix[shot.getX()][shot.getY()] == null) {
+                    switch (shot.getStatus()) {
+                        case HIT:
+                            boardMatrix[shot.getX()][shot.getY()] = "HIT";
+                            board.setLastHit(shot);
+                            break;
+                        case MISS:
+                            boardMatrix[shot.getX()][shot.getY()] = "MISS";
+                            break;
+                        case KILL:
+                            boardMatrix[shot.getX()][shot.getY()] = "KILL";
+                            //TODO restrict some
+                            break;
+                    }
                 }
             }
+
+            String boardJson = new ObjectMapper().writeValueAsString(boardMatrix);
+            board.setBoardJson(boardJson);
+
+            gameBoardRepository.save(board);
         }
+    }
+
+    private String[][] generateBoardWithPlacement(GameStartedEvent event, BattleshipPlacement placement) {
+        String[][] board = new String[event.getBattlegroundSize()][event.getBattlegroundSize()];
+
+
+        return board;
     }
 }
