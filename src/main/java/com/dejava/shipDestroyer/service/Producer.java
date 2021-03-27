@@ -3,6 +3,8 @@ package com.dejava.shipDestroyer.service;
 import com.dejava.shipDestroyer.model.ShotFiredEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +21,17 @@ public class Producer {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    public void shoot(ShotFiredEvent event) {
-        logger.info(String.format("#### -> Producing message -> %s", event));
-
+    public void shoot(ShotFiredEvent event, String token) {
         try {
             String json = new ObjectMapper().writeValueAsString(event);
 
-            this.kafkaTemplate.send(TOPIC, json);
+            logger.info("Sending " + json);
+
+            ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC, json);
+            record.headers().add(new RecordHeader("Authorization", ("Bearer " + token).getBytes()));
+
+//            this.kafkaTemplate.send(TOPIC, json);
+            this.kafkaTemplate.send(record);
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();

@@ -111,7 +111,7 @@ public class Consumer {
                 }
             }
 
-            producer.shoot(shot);
+            producer.shoot(shot, restService.authenticate());
         }
     }
 
