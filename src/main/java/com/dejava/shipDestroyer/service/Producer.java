@@ -14,7 +14,7 @@ public class Producer {
 
     private static final Logger logger = LoggerFactory.getLogger(Producer.class);
 
-    private static final String TOPIC = " cc.battleships.shot";
+    private static final String TOPIC = "cc.battleships.shot";
 
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
