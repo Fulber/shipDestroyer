@@ -92,14 +92,23 @@ public class Consumer {
             logger.info("ROUND STARTED EVENT " + tournamentId + " - " + event.getGameId() + " - " + event.getRoundNo());
 
             Optional<GameBoard> board = gameBoardRepository.findById(event.getGameId());
+            Optional<GameStartedEvent> gameStart = gameStartedEventRepository.findById(event.getGameId());
 
             ShotFiredEvent shot = new ShotFiredEvent(event.getGameId(), tournamentId, event.getRoundNo());
             if (board.isPresent() && board.get().getNextPossibleShot() != null) {
+
+                processing.onHitEvent(gameStart.get(), board.get());
+
                 shot.setX(board.get().getNextPossibleShot().getX());
                 shot.setY(board.get().getNextPossibleShot().getY());
             } else {
-                shot.setX(r.nextInt());
-                shot.setY(r.nextInt());
+                if (gameStart.isPresent()) {
+                    shot.setX(r.nextInt(gameStart.get().getBattlegroundSize()));
+                    shot.setY(r.nextInt(gameStart.get().getBattlegroundSize()));
+                } else {
+                    shot.setX(r.nextInt(10));
+                    shot.setY(r.nextInt(10));
+                }
             }
 
             producer.shoot(shot);
