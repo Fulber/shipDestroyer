@@ -19,7 +19,13 @@ class ShipDestroyerApplicationTests {
     @Test
     void authenticationWorks() {
         String token = restService.authenticate();
+        Assert.notNull(token, "notNull");
+    }
 
-        Assert.notNull(token, "kek");
+    @Test
+    void registerWorks() {
+        String token = restService.authenticate();
+
+        restService.registerToTournament(token, "i4Y6SG6FLw");
     }
 }
