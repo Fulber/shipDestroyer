@@ -3,6 +3,7 @@ package com.dejava.shipDestroyer.service;
 import com.dejava.shipDestroyer.model.GameStartedEvent;
 import com.dejava.shipDestroyer.model.RoundEndedEvent;
 import com.dejava.shipDestroyer.model.RoundStartedEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,20 +28,23 @@ public class Consumer {
     private String tournamentId;
 
     @KafkaListener(topics = "cc.battleships.game.started")
-    public void gameStartedEvent(GameStartedEvent event) throws IOException {
-        logger.info(String.format("#### -> Consumed message -> %s", event));
+    public void gameStartedEvent(String message) throws IOException {
+        logger.info(String.format("#### -> Consumed message -> %s", message));
 
+        GameStartedEvent event = new ObjectMapper().readValue(message, GameStartedEvent.class);
     }
 
     @KafkaListener(topics = "cc.battleships.round.started")
-    public void roundStartedEvent(RoundStartedEvent event) throws IOException {
-        logger.info(String.format("#### -> Consumed message -> %s", event));
+    public void roundStartedEvent(String message) throws IOException {
+        logger.info(String.format("#### -> Consumed message -> %s", message));
 
+        RoundStartedEvent event = new ObjectMapper().readValue(message, RoundStartedEvent.class);
     }
 
     @KafkaListener(topics = "cc.battleships.round.ended")
-    public void roundEndedEvent(RoundEndedEvent event) throws IOException {
-        logger.info(String.format("#### -> Consumed message -> %s", event));
+    public void roundEndedEvent(String message) throws IOException {
+        logger.info(String.format("#### -> Consumed message -> %s", message));
 
+        RoundEndedEvent event = new ObjectMapper().readValue(message, RoundEndedEvent.class);
     }
 }

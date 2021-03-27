@@ -22,4 +22,4 @@ spring:
       group-id: group-014ffa89-f169-4cfa-afd5-fc8d73c6dd75
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
