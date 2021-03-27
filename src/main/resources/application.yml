@@ -4,7 +4,7 @@ logging:
   level:
     root: WARN
     org.springframework: INFO
-    org.apache.kafka: DEBUG
+    org.apache.kafka: WARN
 spring:
   datasource:
     url: jdbc:h2:~/jooq
