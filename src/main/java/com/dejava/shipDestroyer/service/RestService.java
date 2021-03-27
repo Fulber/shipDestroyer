@@ -3,6 +3,8 @@ package com.dejava.shipDestroyer.service;
 import com.dejava.shipDestroyer.model.AuthRequest;
 import com.dejava.shipDestroyer.model.AuthResponse;
 import com.dejava.shipDestroyer.model.BattleshipPlacement;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -49,6 +51,14 @@ public class RestService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(authenticate());
 
-        new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>(placement, headers), Void.class);
+        try {
+            String json = new ObjectMapper().writeValueAsString(placement);
+
+            new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>(json, headers), Void.class);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
     }
 }

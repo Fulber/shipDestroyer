@@ -5,6 +5,8 @@ logging:
     root: INFO
     org.springframework: ERROR
     org.apache.kafka: INFO
+    org.apache.http: DEBUG
+    httpclient.wire: DEBUG
 spring:
   datasource:
     url: jdbc:h2:~/jooq

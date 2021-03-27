@@ -13,6 +13,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -44,6 +45,10 @@ public class Consumer {
 
         if (tournamentId.equals(event.getTournamentId())) {
             logger.info("GAME START EVENT " + tournamentId + " - " + event.getGameId());
+
+            if (gameStartedEventRepository.existsById(event.getGameId())) {
+                return;
+            }
 
             gameStartedEventRepository.save(event);
 
@@ -86,15 +91,15 @@ public class Consumer {
         if (tournamentId.equals(event.getTournamentId())) {
             logger.info("ROUND STARTED EVENT " + tournamentId + " - " + event.getGameId() + " - " + event.getRoundNo());
 
-            GameBoard board = gameBoardRepository.findById(event.getGameId()).get();
+            Optional<GameBoard> board = gameBoardRepository.findById(event.getGameId());
 
             ShotFiredEvent shot = new ShotFiredEvent(event.getGameId(), tournamentId, event.getRoundNo());
-            if (board.getNextPossibleShot() == null) {
-                shot.setX(r.nextInt(board.getBattlegroundSize()));
-                shot.setY(r.nextInt(board.getBattlegroundSize()));
+            if (board.isPresent() && board.get().getNextPossibleShot() != null) {
+                shot.setX(board.get().getNextPossibleShot().getX());
+                shot.setY(board.get().getNextPossibleShot().getY());
             } else {
-                shot.setX(board.getNextPossibleShot().getX());
-                shot.setY(board.getNextPossibleShot().getY());
+                shot.setX(r.nextInt());
+                shot.setY(r.nextInt());
             }
 
             producer.shoot(shot);
@@ -146,8 +151,8 @@ public class Consumer {
             case NORTH:
                 canvasHeight = canvas.length;
                 canvasWidth = canvas[0].length;
-                for(int canvasY = 0; canvasY < canvasHeight; canvasY ++) {
-                    for(int canvasX = 0; canvasX < canvasWidth; canvasX ++) {
+                for (int canvasY = 0; canvasY < canvasHeight; canvasY++) {
+                    for (int canvasX = 0; canvasX < canvasWidth; canvasX++) {
                         board[y + canvasY][x + canvasX] = canvas[canvasY][canvasX].getHp() > 0 ? "MISS" : null;
                     }
                 }
@@ -156,8 +161,8 @@ public class Consumer {
                 canvas = processing.rotateClockWise(canvas);
                 canvasHeight = canvas.length;
                 canvasWidth = canvas[0].length;
-                for(int canvasY = 0; canvasY < canvasHeight; canvasY ++) {
-                    for(int canvasX = 0; canvasX < canvasWidth; canvasX ++) {
+                for (int canvasY = 0; canvasY < canvasHeight; canvasY++) {
+                    for (int canvasX = 0; canvasX < canvasWidth; canvasX++) {
                         board[y + canvasY][x + canvasX] = canvas[canvasY][canvasX].getHp() > 0 ? "MISS" : null;
                     }
                 }
@@ -167,8 +172,8 @@ public class Consumer {
                 canvas = processing.rotateClockWise(canvas);
                 canvasHeight = canvas.length;
                 canvasWidth = canvas[0].length;
-                for(int canvasY = 0; canvasY < canvasHeight; canvasY ++) {
-                    for(int canvasX = 0; canvasX < canvasWidth; canvasX ++) {
+                for (int canvasY = 0; canvasY < canvasHeight; canvasY++) {
+                    for (int canvasX = 0; canvasX < canvasWidth; canvasX++) {
                         board[y - canvasY][x - canvasX] = canvas[canvasY][canvasX].getHp() > 0 ? "MISS" : null;
                     }
                 }
@@ -179,8 +184,8 @@ public class Consumer {
                 canvas = processing.rotateClockWise(canvas);
                 canvasHeight = canvas.length;
                 canvasWidth = canvas[0].length;
-                for(int canvasY = 0; canvasY < canvasHeight; canvasY ++) {
-                    for(int canvasX = 0; canvasX < canvasWidth; canvasX ++) {
+                for (int canvasY = 0; canvasY < canvasHeight; canvasY++) {
+                    for (int canvasX = 0; canvasX < canvasWidth; canvasX++) {
                         board[y - canvasY][x - canvasX] = canvas[canvasY][canvasX].getHp() > 0 ? "MISS" : null;
                     }
                 }
